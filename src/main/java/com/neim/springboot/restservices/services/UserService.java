@@ -1,9 +1,13 @@
 package com.neim.springboot.restservices.services;
 
 import com.neim.springboot.restservices.entities.User;
+import com.neim.springboot.restservices.exceptions.UserExistsException;
+import com.neim.springboot.restservices.exceptions.UserNotFoundException;
 import com.neim.springboot.restservices.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Service;
+import org.springframework.web.server.ResponseStatusException;
 
 import java.util.List;
 import java.util.Optional;
@@ -15,21 +19,34 @@ public class UserService {
     public List<User> getAllUsers() {
         return userRepository.findAll();
     }
-    public User createUser(User user) {
-        return userRepository.save(user);
+    public void createUser(User user) throws UserExistsException {
+        User existingUser = userRepository.findByUsername(user.getUsername());
+        if (existingUser != null) {
+            throw  new UserExistsException("User already exists in repository");
+        }
+        userRepository.save(user);
     }
-    public Optional<User> getUserById(Long id) {
+    public Optional<User> getUserById(Long id) throws UserNotFoundException {
         Optional<User> user = userRepository.findById(id);
+        if (user.isEmpty()) {
+            throw new UserNotFoundException("User not found in user repository.");
+        }
         return user;
     }
-    public User updateUserById(Long id, User user) {
+    public User updateUserById(Long id, User user) throws UserNotFoundException {
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            throw new UserNotFoundException("User not found, provide the correct user ID.");
+        }
         user.setId(id);
         return userRepository.save(user);
     }
     public void deleteUserById(Long id) {
-        if (userRepository.findById(id).isPresent()) {
-            userRepository.deleteById(id);
+        Optional<User> optionalUser = userRepository.findById(id);
+        if (optionalUser.isEmpty()) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST, "User not found, provide the correct user ID.");
         }
+        userRepository.deleteById(id);
     }
     public User getUserByUsername(String username) {
         return userRepository.findByUsername(username);
