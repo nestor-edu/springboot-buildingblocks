@@ -1,6 +1,8 @@
 package com.neim.springboot.restservices.entities;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "users")
@@ -11,9 +13,11 @@ public class User {
     private Long id;
 
     @Column(name = "USER_NAME", length = 50, nullable = false, unique = true)
+    @NotEmpty(message = "Username is mandatory field. Please provide username.")
     private String username;
 
     @Column(name = "FIRST_NAME", length = 50, nullable = false)
+    @Size(min = 2, message = "First name should have at least 2 characters.")
     private String firstname;
 
     @Column(name = "LAST_NAME", length = 50, nullable = false)
