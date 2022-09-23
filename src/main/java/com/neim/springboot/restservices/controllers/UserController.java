@@ -41,9 +41,7 @@ public class UserController {
         } catch (UserExistsException ex) {
             throw new ResponseStatusException(HttpStatus.BAD_REQUEST, ex.getMessage());
         }
-
     }
-
     @GetMapping("/{id}")
     public Optional<User> getUserById(@PathVariable("id") @Min(1) Long id) {
         try {
