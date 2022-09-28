@@ -12,7 +12,7 @@ import java.util.List;
 import java.util.Optional;
 
 @RestController
-@RequestMapping("/users/")
+@RequestMapping("/users")
 public class OrderController {
     @Autowired
     private UserRepository userRepository;
